@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vscode Menu (HTML+Css)</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #1e1e1e;
+    }
+    .menu-item {
+      background-color: #303031;
+      width: 100%;
+      max-width: max-content;
+      min-width: 100%;
+      position: relative;
+    }
+
+    .menu-item .button {
+      all: initial;
+      height: 100%;
+      width: max-content;
+      min-width: max-content;
+      display: inline-block;
+      max-width: 100%;
+    }
+    .menu-item .button span {
+      display: inline-block;
+    }
+    .menu-item .button span::after {
+      content: "";
+      width: 10px;
+      display: inline-block;
+      margin-left: 5px;
+    }
+    .menu-item .button span.arrow::after {
+      content: ">";
+    }
+    .menu-item .button span:nth-child(1) {
+      margin-right: 25px;
+    }
+    .menu-item .button span:nth-last-child(1) {
+      margin-left: auto;
+    }
+    .menu-item .button {
+      color: #b1b1b1;
+      cursor: pointer;
+      font-size: 12px;
+      width: max-content;
+      min-width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 5px 20px;
+      box-sizing: border-box;
+    }
+    .menu-item .children {
+      max-height: 0px;
+      transform: scaleY(0);
+      overflow: hidden;
+      transition: all 0.03s;
+      will-change: max-height;
+      position: absolute;
+      transform-origin: center 0%;
+      border-radius: 3px;
+      padding: 10px 0px;
+      background-color: #303031;
+      width: max-content;
+      box-sizing: 0 0 5px #333;
+    }
+
+    .children .group {
+      margin: 0px;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    .children .menu-item > .button:hover,
+    .children .menu-item > .button:focus,
+    .children .menu-item:focus-within > .button {
+      background-color: #04395e;
+      color: white;
+    }
+
+    .menu-item button:focus + .children {
+      max-height: 999px;
+      transform: scaleY(1);
+      overflow: visible;
+    }
+    .menu-item:focus-within > .children {
+      max-height: 999px;
+      transform: scaleY(1);
+      overflow: visible;
+    }
+
+    .menu-item.right .children {
+      left: calc(100% + 1px);
+      top: -10px;
+    }
+    /* .menu-item.down {
+      width: max-content;
+    } */
+    .menu-item.down > .children,
+    .menu-item.down .group > .children {
+      left: 0px;
+      top: calc(100% + 1px);
+      /* width: max-content; */
+    }
+    .menu-item.down .children .menu-item {
+      /* display: inline-block; */
+    }
+    .parent {
+      width: max-content;
+      display: inline-block;
+      min-width: inherit;
+      background-color: #3c3c3c;
+    }
+    .parent:focus-within > button {
+      background-color: #454646;
+    }
+  </style>
+  <body>
+    <section style="display: flex; width: 100%; background-color: #3c3c3c">
+      <div class="button menu-item down parent">
+        <button class="button">File</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+          <div class="menu-item">
+            <section class="button">
+              <span>New File</span>
+              <span>Ctrl+Alt+Windows+N</span>
+            </section>
+          </div>
+          <div class="menu-item">
+            <section class="button">
+              <span>New Window</span>
+              <span>Ctrl+Shift+N</span>
+            </section>
+          </div>
+          <div class="menu-item">
+            <section class="button">
+              <span>Open File</span>
+              <span>Ctrl+O</span>
+            </section>
+          </div>
+          <div class="menu-item">
+            <section class="button">
+              <span>Open Folder</span>
+              <span>Ctrl+K Ctrl+O</span>
+            </section>
+          </div>
+          <div class="menu-item">
+            <section class="button">
+              <span>Open Workspace from File</span>
+              <span></span>
+            </section>
+          </div>
+          <div class="menu-item right">
+            <button class="button">
+              <span>Open Recent</span>
+              <span class="arrow"></span>
+            </button>
+            <section class="children">
+              <div class="menu-item">
+                <section class="button">
+                  <span>C://hello/nice/to/see/you</span>
+                  <span></span>
+                </section>
+              </div>
+              <div class="menu-item">
+                <section class="button">
+                  <span>C://hello/nice/to/see/you</span>
+                  <span></span>
+                </section>
+              </div>
+              <div class="menu-item">
+                <section class="button">
+                  <span>C://hello/nice/to/see/you</span>
+                  <span></span>
+                </section>
+              </div>
+              <div class="menu-item">
+                <section class="button">
+                  <span>C://hello/nice/to/see/you</span>
+                  <span></span>
+                </section>
+              </div>
+            </section>
+          </div>
+          <div class="menu-item right">
+            <button class="button">
+              <span>Add Folder to Workspace</span>
+              <span class="arrow"></span>
+            </button>
+
+            <section class="children">
+              <div class="menu-item">
+                <button class="button">
+                  <span>Show More</span>
+                  <span class="arrow"></span>
+                </button>
+
+                <section class="children">
+                  <div class="menu-item">
+                    <section class="button">
+                      <span>4.1</span> <span>Ctrl+H</span>
+                    </section>
+                  </div>
+                  <div class="menu-item">
+                    <section class="button">
+                      <span>4.1</span> <span>Ctrl+H</span>
+                    </section>
+                  </div>
+                  <div class="menu-item">
+                    <section class="button">
+                      <span>4.1</span> <span>Ctrl+H</span>
+                    </section>
+                  </div>
+                  <div class="menu-item">
+                    <section class="button">
+                      <span>4.1</span> <span>Ctrl+H</span>
+                    </section>
+                  </div>
+                </section>
+              </div>
+              <div class="menu-item">
+                <button class="button">
+                  <span>Show More</span>
+                  <span class="arrow"></span>
+                </button>
+                <section class="children">
+                  <div class="menu-item">
+                    <section class="button">
+                      <span>4.1</span> <span>Ctrl+H</span>
+                    </section>
+                  </div>
+                  <div class="menu-item">
+                    <section class="button">
+                      <span>4.1</span> <span>Ctrl+H</span>
+                    </section>
+                  </div>
+                </section>
+              </div>
+              <div class="menu-item">
+                <section class="button">
+                  <span>4.1</span> <span>Ctrl+H</span>
+                </section>
+              </div>
+              <div class="menu-item">
+                <section class="button">
+                  <span>4.1</span> <span>Ctrl+H</span>
+                </section>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
+      <div class="button menu-item down parent">
+        <button class="button">Edit</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+        </section>
+      </div>
+      <div class="button menu-item down parent">
+        <button class="button">Selection</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+        </section>
+      </div>
+      <div class="button menu-item down parent">
+        <button class="button">View</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+        </section>
+      </div>
+      <div class="button menu-item down parent">
+        <button class="button">Go</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+        </section>
+      </div>
+      <div class="button menu-item down parent">
+        <button class="button">Run</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+        </section>
+      </div>
+      <div class="button menu-item down parent">
+        <button class="button">Terminal</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+        </section>
+      </div>
+      <div class="button menu-item down parent">
+        <button class="button">Help</button>
+        <section class="children">
+          <div class="menu-item">
+            <section class="button">
+              <span>New Text File</span>
+              <span>Ctrl+N</span>
+            </section>
+          </div>
+        </section>
+      </div>
+    </section>
+  </body>
+</html>
