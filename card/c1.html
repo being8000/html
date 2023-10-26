@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .box {
+        width: 100px;
+        height: 100px;
+        background-color: aqua;
+        cursor: move;
+      }
+      #div1 {
+      }
+    </style>
+  </head>
+  <body class="min-h-screen items-center">
+    <section class="flex" ondrop="drop(event)" ondragover="dragover(event)">
+      <div
+        id="drag0"
+        class="box"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        1
+      </div>
+      <div
+        id="drag1"
+        class="box bg-[red]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        2
+      </div>
+      <div
+        id="drag2"
+        class="box bg-[orange] w-[150px]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        3
+      </div>
+      <div
+        id="drag3"
+        class="box bg-[darkblue]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        4
+      </div>
+      <div
+        id="drag4"
+        class="box bg-[gray] w-[250px]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        5
+      </div>
+    </section>
+    <section class="flex" ondrop="drop(event)" ondragover="dragover(event)">
+      <div
+        id="drag0"
+        class="box"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        1
+      </div>
+      <div
+        id="drag1"
+        class="box bg-[red]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        2
+      </div>
+      <div
+        id="drag2"
+        class="box bg-[orange] w-[150px]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        3
+      </div>
+      <div
+        id="drag3"
+        class="box bg-[darkblue]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        4
+      </div>
+      <div
+        id="drag4"
+        class="box bg-[gray] w-[250px]"
+        draggable="true"
+        ondragstart="drag(event)"
+        ondragenter="dragEnter(event)"
+        ondragleave="dragLeave(event)"
+        ondragend="dragend(event)"
+      >
+        5
+      </div>
+    </section>
+  </body>
+  <script>
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    let dragEle = null;
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+      console.log(ev.target);
+      ev.target.classList.add("border");
+      dragEle = ev.target;
+      console.log("drag");
+    }
+    function dragend(ev) {
+      ev.target.classList.remove("border");
+      dragEle = null;
+      console.log("dragend");
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      var data = ev.dataTransfer.getData("text");
+      console.log("drop", data);
+      // ev.target.appendChild(document.getElementById(data));
+    }
+    const d = document.getElementById("body");
+    function dragEnter(ev) {
+      const { target } = ev;
+      // console.log(target.parentElement, "parent");
+      // target.parentElement.insertBefore(dragEle, target);
+      // console.log(target, "dragEnter");
+    }
+    function dragLeave(ev) {
+      // const { target, offsetX,  offsetY} = ev;
+      // target.parentElement.insertBefore(target, dragEle);
+      // console.log(target, ev, "dragLeave");
+    }
+    function dragover(ev) {
+      const { target, offsetX, offsetY, pageX, pageY, x, y } = ev;
+      const rect = target.getBoundingClientRect();
+      const left = rect.left + rect.width / 2;
+      if (pageX > left) {
+        target.parentElement.insertBefore(target, dragEle);
+      } else {
+        target.parentElement.insertBefore(dragEle, target);
+      }
+    }
+  </script>
+</html>

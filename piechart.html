@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>canvas test</title>
+    <style type="text/css">
+      .container {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+    <script src="./timing.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <canvas width="300" height="300"></canvas>
+    </div>
+  </body>
+  <script>
+    const canvas = document.querySelector("canvas");
+    let ctx = canvas.getContext("2d");
+    let width = canvas.width,
+      height = canvas.height;
+    if (window.devicePixelRatio) {
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      canvas.height = height * window.devicePixelRatio;
+      canvas.width = width * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    // ctx.globalCompositeOperation = "source-atop";
+    const results = [
+      { mood: "Angry", total: 1499, shade: "#0a9627" },
+      { mood: "Happy", total: 478, shade: "#960A2C" },
+      { mood: "Melancholic", total: 332, shade: "#332E2E" },
+      { mood: "Gloomy", total: 195, shade: "#F73809" },
+    ];
+
+    let sum = 0;
+    let totalNumberOfPeople = results.reduce(
+      (sum, { total }) => sum + total,
+      0
+    );
+    let currentAngle = 0;
+
+    for (let moodValue of results) {
+      //calculating the angle the slice (portion) will take in the chart
+      moodValue.currentAngle = currentAngle;
+      let portionAngle = (moodValue.total / totalNumberOfPeople) * 2 * Math.PI;
+      moodValue.portionAngle = portionAngle;
+      currentAngle += portionAngle;
+    }
+
+    const centerX = 150;
+    const centerY = 150;
+    const radius = 100;
+    let requestId = null;
+    function draw(progress) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let moodValue of results) {
+        const { currentAngle, portionAngle } = moodValue;
+        const step = portionAngle * progress;
+        ctx.beginPath();
+        const a = ctx.arc(
+          centerX,
+          centerY,
+          radius,
+          currentAngle,
+          currentAngle + step
+        );
+        ctx.strokeStyle = moodValue.shade;
+        ctx.lineTo(centerX, centerY);
+        //filling the slices with the corresponding mood's color
+        ctx.fillStyle = moodValue.shade;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    function startAnimate({ timing, draw, duration }) {
+      let start = performance.now();
+      requestAnimationFrame(function animate(time) {
+        // timeFraction goes from 0 to 1
+        let timeFraction = (time - start) / duration;
+        if (timeFraction > 1) timeFraction = 1;
+
+        // calculate the current animation state
+        let progress = timing(timeFraction);
+
+        draw(progress); // draw it
+
+        if (timeFraction < 1) {
+          requestAnimationFrame(animate);
+        }
+      });
+    }
+    startAnimate({
+      timing: makeEaseOut(bounce),
+      draw: draw,
+      duration: 1000,
+    });
+    function hoverDraw(progress) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let moodValue of results) {
+        const { currentAngle, portionAngle, hover } = moodValue;
+        let step = 0;
+        if (hover) {
+          step = 5 * progress;
+        }
+        ctx.beginPath();
+        const a = ctx.arc(
+          centerX,
+          centerY,
+          radius + step,
+          currentAngle,
+          currentAngle + portionAngle
+        );
+        ctx.strokeStyle = moodValue.shade;
+        ctx.lineTo(centerX, centerY);
+        //filling the slices with the corresponding mood's color
+        ctx.fillStyle = moodValue.shade;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    const ctxRect = canvas.getBoundingClientRect();
+
+    lastHoverIndex = null;
+    canvas.addEventListener("mousemove", function (p) {
+      const { x, y } = p;
+      const distanceX = x - ctxRect.left - centerX,
+        distanceY = y - ctxRect.top - centerY;
+      const inCircle = Math.round(
+        Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2))
+      );
+
+      if (inCircle <= radius) {
+        const angle = Math.atan(Math.abs(distanceY) / Math.abs(distanceX));
+
+        let realAngle = 0;
+        if (distanceX < 0 && distanceY < 0) {
+          realAngle = Math.PI + angle;
+        } else if (distanceX > 0 && distanceY < 0) {
+          realAngle = Math.PI * 2 - angle;
+        } else if (distanceX < 0 && distanceY > 0) {
+          realAngle = Math.PI - angle;
+        } else if (distanceX > 0 && distanceY > 0) {
+          realAngle = angle;
+        } else {
+        }
+        let hIndex = null;
+        results.forEach((m, index) => {
+          if (
+            realAngle >= m.currentAngle &&
+            realAngle < m.portionAngle + m.currentAngle
+          ) {
+            m.hover = true;
+            hIndex = index;
+          } else {
+            m.hover = false;
+          }
+        });
+        if (lastHoverIndex == hIndex) {
+          return;
+        }
+        startAnimate({
+          timing: makeEaseOut(linear),
+          draw: hoverDraw,
+          duration: 50,
+        });
+        lastHoverIndex = hIndex;
+      }
+    });
+  </script>
+</html>
