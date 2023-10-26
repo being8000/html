@@ -1,3 +1,8 @@
+/**
+ * @website https://javascript.info/animation
+ * @param {*}  
+ * @returns 
+ */
 function bounce(timeFraction) {
   for (let a = 0, b = 1; 1; a += b, b /= 2) {
     if (timeFraction >= (7 - 4 * a) / 11) {
