@@ -35,6 +35,7 @@
       { mood: "Happy", total: 478, shade: "#960A2C" },
       { mood: "Melancholic", total: 332, shade: "#332E2E" },
       { mood: "Gloomy", total: 195, shade: "#F73809" },
+      { mood: "Gloomy2", total: 800, shade: "#7c7fb4" },
     ];
 
     let sum = 0;
@@ -59,15 +60,19 @@
     function draw(progress) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let moodValue of results) {
-        const { currentAngle, portionAngle } = moodValue;
-        const step = portionAngle * progress;
+        const { currentAngle, portionAngle, hover } = moodValue;
+        const angleStep = portionAngle * progress;
+        let step = 0;
+        if (hover) {
+          step = 5 * progress;
+        }
         ctx.beginPath();
         const a = ctx.arc(
           centerX,
           centerY,
-          radius,
+          radius + step,
           currentAngle,
-          currentAngle + step
+          currentAngle + angleStep
         );
         ctx.strokeStyle = moodValue.shade;
         ctx.lineTo(centerX, centerY);
