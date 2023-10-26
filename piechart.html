@@ -147,7 +147,6 @@
           realAngle = Math.PI - angle;
         } else if (distanceX > 0 && distanceY > 0) {
           realAngle = angle;
-        } else {
         }
         let hIndex = null;
         results.forEach((m, index) => {
@@ -170,6 +169,18 @@
           duration: 50,
         });
         lastHoverIndex = hIndex;
+      } else {
+        if (lastHoverIndex != null) {
+          results.forEach((m, index) => {
+            m.hover = false;
+          });
+          startAnimate({
+            timing: makeEaseOut(linear),
+            draw: hoverDraw,
+            duration: 50,
+          });
+          lastHoverIndex = null;
+        }
       }
     });
   </script>
