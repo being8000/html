@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>画布放大缩小</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      // 获取画布元素和上下文
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+
+      // 设置设备像素比例
+      var devicePixelRatio = window.devicePixelRatio || 1;
+
+      // 设置画布的大小和分辨率
+      canvas.width = canvas.clientWidth * devicePixelRatio;
+      canvas.height = canvas.clientHeight * devicePixelRatio;
+
+      // 缩放画布
+      context.scale(devicePixelRatio, devicePixelRatio);
+
+      // 初始缩放比例和矩形大小
+      var scale = 1;
+      var rectangleWidth = 200;
+      var rectangleHeight = 150;
+
+      // 绘制矩形
+      function drawRectangle() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "purple";
+
+        var scaledWidth = rectangleWidth * scale;
+        var scaledHeight = rectangleHeight * scale;
+        var x = (canvas.width - scaledWidth) / 2;
+        var y = (canvas.height - scaledHeight) / 2;
+
+        context.fillRect(x, y, scaledWidth, scaledHeight);
+      }
+
+      // 鼠标滚轮事件
+      canvas.addEventListener("wheel", function (event) {
+        event.preventDefault(); // 阻止滚轮的默认行为（即页面滚动）
+
+        var delta = event.deltaY; // 获取滚轮的滚动方向和速度
+        var zoomAmount = 0.1; // 缩放增量
+
+        if (delta < 0) {
+          // 向上滚动，放大画布
+          scale += zoomAmount;
+        } else {
+          // 向下滚动，缩小画布
+          scale -= zoomAmount;
+        }
+
+        // 限制缩放范围在0.1到3之间
+        scale = Math.max(0.1, Math.min(scale, 3));
+
+        // 重新绘制矩形
+        drawRectangle();
+      });
+
+      // 初始绘制矩形
+      drawRectangle();
+    </script>
+  </body>
+</html>

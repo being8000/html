@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>在线表格</title>
+    <style>
+      table {
+        border-collapse: collapse;
+      }
+
+      td,
+      th {
+        border: 1px solid black;
+        padding: 5px;
+      }
+
+      .edit-cell {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <table id="spreadsheet">
+      <thead>
+        <tr>
+          <th>列1</th>
+          <th>列2</th>
+          <th>列3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="editable-cell">1</td>
+          <td class="editable-cell">2</td>
+          <td class="editable-cell">3</td>
+        </tr>
+        <tr>
+          <td class="editable-cell">4</td>
+          <td class="editable-cell">5</td>
+          <td class="editable-cell">6</td>
+        </tr>
+        <tr>
+          <td class="editable-cell">7</td>
+          <td class="editable-cell">8</td>
+          <td class="editable-cell">9</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <input type="text" id="cellInput" class="edit-cell" />
+
+    <script>
+      var editableCells = document.getElementsByClassName("editable-cell");
+      var cellInput = document.getElementById("cellInput");
+
+      for (var i = 0; i < editableCells.length; i++) {
+        editableCells[i].addEventListener("click", function (event) {
+          var cell = event.target;
+          var cellValue = cell.innerText;
+
+          cell.classList.add("edit-cell");
+          cellInput.value = cellValue;
+          cellInput.style.left = cell.offsetLeft + "px";
+          cellInput.style.top = cell.offsetTop + "px";
+          cellInput.style.display = "block";
+          cellInput.focus();
+        });
+      }
+
+      cellInput.addEventListener("blur", function () {
+        var activeCell = document.querySelector(".edit-cell");
+        activeCell.innerText = cellInput.value;
+        cellInput.style.display = "none";
+        activeCell.classList.remove("edit-cell");
+      });
+    </script>
+  </body>
+</html>

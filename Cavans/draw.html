@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Canvas 钢笔工具</title>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+      // 获取对 canvas 元素的引用
+      var canvas = document.getElementById("myCanvas");
+
+      // 创建绘图上下文
+      var context = canvas.getContext("2d");
+
+      // 设置画布的宽度和高度
+      canvas.width = 500;
+      canvas.height = 300;
+
+      // 记录路径的点集
+      var points = [];
+
+      // 标记是否正在绘制路径
+      var isDrawing = false;
+
+      // 监听鼠标按下事件
+      canvas.addEventListener("mousedown", function (event) {
+        isDrawing = true;
+
+        // 获取鼠标点击的点的坐标
+        var point = {
+          x: event.clientX - canvas.offsetLeft,
+          y: event.clientY - canvas.offsetTop,
+        };
+
+        // 添加点到路径的点集中
+        points.push(point);
+      });
+
+      // 监听鼠标移动事件
+      canvas.addEventListener("mousemove", function (event) {
+        if (isDrawing) {
+          // 获取鼠标移动的点的坐标
+          var point = {
+            x: event.clientX - canvas.offsetLeft,
+            y: event.clientY - canvas.offsetTop,
+          };
+
+          // 添加点到路径的点集中
+          points.push(point);
+
+          // 清空画布
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          // 绘制辅助线
+          drawGuideLines();
+
+          // 绘制路径
+          drawPath();
+        }
+      });
+
+      // 监听鼠标释放事件
+      canvas.addEventListener("mouseup", function (event) {
+        isDrawing = false;
+      });
+
+      // 绘制辅助线
+      function drawGuideLines() {
+        // 设置辅助线样式
+        context.strokeStyle = "gray";
+        context.lineWidth = 1;
+
+        // 绘制辅助线
+        context.beginPath();
+        for (var i = 0; i < points.length - 1; i++) {
+          context.moveTo(points[i].x, points[i].y);
+          context.lineTo(points[i + 1].x, points[i + 1].y);
+        }
+        context.stroke();
+      }
+
+      // 绘制路径
+      function drawPath() {
+        // 设置路径样式
+        context.strokeStyle = "black";
+        context.lineWidth = 2;
+
+        context.beginPath();
+        context.moveTo(points[0].x, points[0].y);
+
+        for (var i = 1; i < points.length; i++) {
+          var point = points[i];
+          var prevPoint = points[i - 1];
+          var midPoint = {
+            x: (point.x + prevPoint.x) / 2,
+            y: (point.y + prevPoint.y) / 2,
+          };
+
+          context.quadraticCurveTo(
+            prevPoint.x,
+            prevPoint.y,
+            midPoint.x,
+            midPoint.y
+          );
+        }
+
+        context.stroke();
+      }
+    </script>
+  </body>
+</html>

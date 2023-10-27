@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      circle {
+        fill: black;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      h1 {
+        color: white;
+      }
+      #rect text {
+        pointer-events: none;
+      }
+
+      body {
+        background-color: black;
+        color: #999;
+        font-family: "Signika Negative", Arial, sans-serif;
+        font-weight: 300;
+        font-size: 17px;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      svg {
+        overflow: visible;
+        height: 100%;
+
+        /* Fix Safari rendering bug */
+        transform: translateZ(0);
+      }
+
+      path {
+        stroke-width: 2;
+        stroke: gray;
+      }
+
+      a {
+        color: #88ce02;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      #div {
+        width: 120px;
+        height: 60px;
+        pointer-events: none;
+        background-color: #aa00ee;
+        color: black;
+        text-align: center;
+        line-height: 60px;
+        position: absolute;
+        top: 30%;
+        left: 60%;
+        font-size: 32px;
+      }
+
+      .gsap-3-logo {
+        width: 20vw;
+        max-width: 150px;
+        position: fixed;
+        bottom: 15px;
+        right: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <svg width="100%" height="100%" viewBox="-20 0 557 190" id="svg">
+      <circle cx="100" cy="100" r="3" />
+      <circle cx="300" cy="20" r="3" />
+      <path id="curve" d="M9,100c0,0,18.53-41.58,49.91-65.11c30-22.5,65.81-24.88,77.39-24.88c33.87,0,57.55,11.71,77.05,28.47c23.09,19.85,40.33,46.79,61.71,69.77c24.09,25.89,53.44,46.75,102.37,46.75c22.23,0,40.62-2.83,55.84-7.43c27.97-8.45,44.21-22.88,54.78-36.7c14.35-18.75,16.43-36.37,16.43-36.37"/>
+      <g id="rectangle">
+        <rect width="85" height="30" fill="dodgerblue" />
+        <text x="10" y="19" font-size="14">SVG &lt;rect&gt;</text>
+      </g>
+    </svg>
+     -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
+      <path
+        id="curve"
+        d="M9,100c0,0,18.53-41.58,49.91-65.11c30-22.5,65.81-24.88,77.39-24.88c33.87,0,57.55,11.71,77.05,28.47c23.09,19.85,40.33,46.79,61.71,69.77c24.09,25.89,53.44,46.75,102.37,46.75c22.23,0,40.62-2.83,55.84-7.43c27.97-8.45,44.21-22.88,54.78-36.7c14.35-18.75,16.43-36.37,16.43-36.37"
+        fill="none"
+        stroke="black"
+      />
+      <g width="85" height="30">
+        <rect id="rectangle" width="85" height="30" fill="dodgerblue" />
+        <text x="10" y="19" font-size="14">SVG &lt;rect&gt;</text>
+      </g>
+    </svg>
+  </body>
+  <script>
+    // 获取曲线元素和矩形元素
+    const curve = document.getElementById("curve");
+    const rectangle = document.getElementById("rectangle");
+
+    // 定义动画循环
+    function animate(timestamp) {
+      // 获取曲线总长度
+      const curveLength = curve.getTotalLength();
+
+      // 设置运动速度
+      const speed = 0.2; // 调整此值以改变速度
+
+      // 根据当前时间计算矩形应该在曲线上的位置
+      const position = (timestamp * speed) % curveLength;
+
+      // 获取曲线上的点坐标和下一个点坐标
+      const point = curve.getPointAtLength(position);
+      const nextPoint = curve.getPointAtLength((position + 1) % curveLength);
+
+      // 计算切线向量
+      const dx = nextPoint.x - point.x;
+      const dy = nextPoint.y - point.y;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      // 更新矩形的位置和旋转角度
+      rectangle.setAttribute(
+        "x",
+        point.x - rectangle.getAttribute("width") / 2
+      );
+      rectangle.setAttribute(
+        "y",
+        point.y - rectangle.getAttribute("height") / 2
+      );
+      rectangle.setAttribute(
+        "transform",
+        `rotate(${angle}, ${point.x}, ${point.y})`
+      );
+
+      // 循环调用动画函数
+      requestAnimationFrame(animate);
+    }
+
+    // 启动动画循环
+    requestAnimationFrame(animate);
+  </script>
+</html>

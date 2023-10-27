@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: antiquewhite;
+      min-height: 100vh;
+      min-width: 100vw;
+    }
+    #dragD {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: azure;
+    }
+  </style>
+  <body>
+    hello
+    <div id="dragD">
+      <div
+        style="height: 200px; width: 100%; background-color: rgb(216, 165, 87)"
+      >
+        slide down
+      </div>
+      <div style="height: 200px; width: 100%; background-color: brown">1</div>
+    </div>
+  </body>
+
+  <script>
+    const dom = document.querySelector("#dragD");
+    let startX,
+      startY = null;
+
+    const maximunSlide = 200;
+    const screenHeight = window.screen.availHeight;
+    let isGrabbed = false;
+    let currentTranslate = 0;
+    let animateId = null;
+
+    function getXY(e) {
+      return {
+        x: e.type.includes("mouse") ? e.pageX : e.touches[0].pageX,
+        y: e.type.includes("mouse") ? e.pageY : e.touches[0].pageY,
+      };
+    }
+
+    function animate() {
+      // Here's the animate function and it changes the position of slider.
+      setTransform();
+      if (isGrabbed) {
+        // If grabbed is true, it will be repeated like an animaiton so that we can see the smooth transition.
+        requestAnimationFrame(animate);
+      }
+    }
+
+    function setTransform() {
+      dom.style.transform = `translateY(${currentTranslate}px)`;
+    }
+    const start = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const r = getXY(e);
+      startX = r.x;
+      startY = r.y;
+      console.log("start", getXY(e));
+      dom.style.transition = "0.3s all";
+      isGrabbed = true;
+      dom.classList.add("grabbing");
+      animateId = requestAnimationFrame(animate);
+    };
+    dom.addEventListener("touchstart", start);
+    dom.addEventListener("mousedown", start);
+    const move = (e) => {
+      if (isGrabbed) {
+        e.preventDefault();
+        e.stopPropagation();
+        const c = getXY(e);
+        currentTranslate = c.y - startY;
+        if (currentTranslate < 0) {
+          currentTranslate = 0;
+        }
+      }
+    };
+    dom.addEventListener("touchmove", move);
+    dom.addEventListener("mousemove", move);
+    const end = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dom.style.transform = null;
+      dom.style.transition = "0.3s all";
+      startX = null;
+      startY = null;
+      isGrabbed = false;
+      dom.classList.remove("grabbing");
+      currentTranslate = 0;
+      cancelAnimationFrame(animateId);
+    };
+    dom.addEventListener("touchend", end);
+    dom.addEventListener("mouseup", end);
+    dom.addEventListener("mousleave", end);
+  </script>
+</html>

@@ -1,5 +1,6 @@
 /**
  * @website https://javascript.info/animation
+ * @website https://www.desmos.com/calculator/ebdtbxgbq0
  * @param {*}  
  * @returns 
  */
@@ -20,4 +21,12 @@ function makeEaseOut(timing) {
   return function (timeFraction) {
     return 1 - timing(1 - timeFraction);
   }
+}
+
+
+function stretchY(t) {
+  return Math.pow(1 - t, 3) * 0 +
+    3 * t * Math.pow(1 - t, 2) * 0.154 +
+    3 * Math.pow(t, 2) * (1 - t) * 0.434 +
+    Math.pow(t, 3) * 1
 }

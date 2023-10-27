@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Canvas放大缩小、拖动和网格背景</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      canvas {
+        border: 1px solid #000;
+        cursor: move;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+
+      // 设置 Canvas 大小与 body 一致
+      canvas.width = document.body.clientWidth;
+      canvas.height = document.body.clientHeight;
+
+      var rect = {
+        x: canvas.width / 2 - 50,
+        y: canvas.height / 2 - 25,
+        width: 100,
+        height: 50,
+      };
+
+      draw();
+
+      function draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 绘制网格背景
+        var gridSize = 50; // 网格大小
+        context.strokeStyle = "#ccc"; // 网格线颜色
+        context.lineWidth = 1;
+
+        for (var x = 0; x < canvas.width; x += gridSize) {
+          context.beginPath();
+          context.moveTo(x, 0);
+          context.lineTo(x, canvas.height);
+          context.stroke();
+        }
+
+        for (var y = 0; y < canvas.height; y += gridSize) {
+          context.beginPath();
+          context.moveTo(0, y);
+          context.lineTo(canvas.width, y);
+          context.stroke();
+        }
+
+        // 绘制矩形
+        context.fillRect(rect.x, rect.y, rect.width, rect.height);
+      }
+
+      var isDragging = false;
+      var dragStartX = 0;
+      var dragStartY = 0;
+      var offsetX = 0;
+      var offsetY = 0;
+      var scale = 1;
+      var lastScale = 1;
+
+      canvas.addEventListener("mousedown", function (event) {
+        if (event.button === 0) {
+          isDragging = true;
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
+          canvas.style.cursor = "grabbing";
+        }
+      });
+
+      canvas.addEventListener("mousemove", function (event) {
+        if (isDragging) {
+          var deltaX = event.clientX - dragStartX;
+          var deltaY = event.clientY - dragStartY;
+          offsetX += deltaX;
+          offsetY += deltaY;
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
+          draw();
+        }
+      });
+
+      canvas.addEventListener("mouseup", function (event) {
+        if (event.button === 0) {
+          isDragging = false;
+          canvas.style.cursor = "grab";
+        }
+      });
+
+      canvas.addEventListener("wheel", function (event) {
+        event.preventDefault();
+        var zoomDelta = event.deltaY > 0 ? 0.9 : 1.1;
+        var mouseX = event.clientX - canvas.offsetLeft;
+        var mouseY = event.clientY - canvas.offsetTop;
+        lastScale = scale;
+        scale *= zoomDelta;
+        offsetX = (offsetX - mouseX) * zoomDelta + mouseX;
+        offsetY = (offsetY - mouseY) * zoomDelta + mouseY;
+        draw();
+      });
+
+      function limitScale() {
+        var minScale = Math.min(
+          canvas.width / rect.width,
+          canvas.height / rect.height
+        );
+        scale = Math.max(minScale, scale);
+      }
+
+      function limitOffset() {
+        var minOffsetX = canvas.width - rect.width * scale;
+        var minOffsetY = canvas.height - rect.height * scale;
+        offsetX = Math.max(Math.min(offsetX, 0), minOffsetX);
+        offsetY = Math.max(Math.min(offsetY, 0), minOffsetY);
+      }
+
+      function limitZoom() {
+        if (scale < lastScale) {
+          if (
+            rect.x < 0 ||
+            rect.y < 0 ||
+            rect.x + rect.width > canvas.width ||
+            rect.y + rect.height > canvas.height
+          ) {
+            scale = lastScale;
+          }
+        }
+      }
+
+      canvas.addEventListener("mouseleave", function () {
+        isDragging = false;
+        canvas.style.cursor = "grab";
+      });
+
+      window.addEventListener("resize", function () {
+        canvas.width = document.body.clientWidth;
+        canvas.height = document.body.clientHeight;
+        limitScale();
+        limitOffset();
+        limitZoom();
+        draw();
+      });
+    </script>
+  </body>
+</html>

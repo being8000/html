@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>游戏地图</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      // 获取画布元素和上下文
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+
+      // 地图数据（示例）
+      var mapData = [
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1],
+        // 其他地图数据...
+      ];
+
+      // 地图尺寸
+      var tileSize = 50;
+      var mapWidth = mapData[0].length * tileSize;
+      var mapHeight = mapData.length * tileSize;
+
+      // 初始化地图位置和缩放
+      var offsetX = 0;
+      var offsetY = 0;
+      var scale = 1;
+
+      // 设置画布大小
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // 绘制地图
+      function drawMap() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var y = 0; y < mapData.length; y++) {
+          for (var x = 0; x < mapData[y].length; x++) {
+            var tile = mapData[y][x];
+
+            if (tile === 1) {
+              context.fillStyle = "gray";
+              context.fillRect(
+                x * tileSize * scale + offsetX,
+                y * tileSize * scale + offsetY,
+                tileSize * scale,
+                tileSize * scale
+              );
+            }
+          }
+        }
+      }
+
+      // 绘制初始地图
+      drawMap();
+
+      // 鼠标拖动
+      var isDragging = false;
+      var dragStartX = 0;
+      var dragStartY = 0;
+
+      canvas.addEventListener("mousedown", function (event) {
+        if (event.button === 0) {
+          isDragging = true;
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
+          canvas.style.cursor = "grabbing";
+        }
+      });
+
+      canvas.addEventListener("mousemove", function (event) {
+        if (isDragging) {
+          var deltaX = event.clientX - dragStartX;
+          var deltaY = event.clientY - dragStartY;
+          offsetX += deltaX;
+          offsetY += deltaY;
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
+          limitMapPosition();
+          drawMap();
+        }
+      });
+
+      canvas.addEventListener("mouseup", function (event) {
+        if (event.button === 0) {
+          isDragging = false;
+          canvas.style.cursor = "grab";
+        }
+      });
+
+      // 鼠标滚轮缩放
+      canvas.addEventListener("wheel", function (event) {
+        event.preventDefault();
+        var zoomDelta = event.deltaY > 0 ? 0.9 : 1.1;
+        var mouseX = event.clientX - canvas.offsetLeft;
+        var mouseY = event.clientY - canvas.offsetTop;
+        var oldScale = scale;
+        scale *= zoomDelta;
+        offsetX = (offsetX - mouseX) * zoomDelta + mouseX;
+        offsetY = (offsetY - mouseY) * zoomDelta + mouseY;
+        limitMapScale();
+        limitMapPosition();
+        drawMap();
+      });
+
+      // 限制地图缩放
+      function limitMapScale() {
+        var minScale = Math.min(
+          canvas.width / (mapWidth * 1.5),
+          canvas.height / (mapHeight * 1.5)
+        );
+        scale = Math.max(minScale, scale);
+      }
+
+      // 限制地图位置
+      function limitMapPosition() {
+        var minOffsetX = canvas.width - mapWidth * scale;
+        var minOffsetY = canvas.height - mapHeight * scale;
+        offsetX = Math.max(Math.min(offsetX, 0), minOffsetX);
+        offsetY = Math.max(Math.min(offsetY, 0), minOffsetY);
+      }
+    </script>
+  </body>
+</html>

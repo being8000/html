@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Photoshop拖拽图形</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: default;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      // 获取画布元素和上下文
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+
+      // 设置画布大小
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // 存储图形的数组
+      var shapes = [];
+
+      // 鼠标拖拽标识
+      var isDragging = false;
+      var dragStartX = 0;
+      var dragStartY = 0;
+      var dragOffsetX = 0;
+      var dragOffsetY = 0;
+      // 键盘长按标识
+      var isSpacePressed = false;
+
+      // 设置设备像素比例
+      var devicePixelRatio = window.devicePixelRatio || 1;
+
+      // 设置画布的大小和分辨率
+      canvas.width = canvas.clientWidth * devicePixelRatio;
+      canvas.height = canvas.clientHeight * devicePixelRatio;
+
+      // 缩放画布
+      context.scale(devicePixelRatio, devicePixelRatio);
+
+      // 初始缩放比例和矩形大小
+      var offsetX = 0;
+      var offsetY = 0;
+      var scale = 1;
+      // 绘制图形
+      function drawShape(x, y) {
+        context.fillStyle = "purple";
+        var scaledWidth = 200 * scale;
+        var scaledHeight = 150 * scale;
+
+        context.fillRect(
+          x * scale + offsetX,
+          y * scale + offsetY,
+          scaledWidth,
+          scaledHeight
+        );
+      }
+
+      // 绘制所有图形
+      function draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < shapes.length; i++) {
+          var shape = shapes[i];
+          drawShape(shape.x, shape.y);
+        }
+      }
+
+      // 鼠标按下事件
+      canvas.addEventListener("mousedown", function (event) {
+        if (event.button === 0) {
+          isDragging = true;
+          dragStartX = event.clientX;
+          dragStartY = event.clientY;
+
+          if (!isSpacePressed) {
+            // 添加图形
+            var shape = { x: dragStartX, y: dragStartY };
+            shapes.push(shape);
+
+            draw();
+          }
+        }
+      });
+
+      // 鼠标移动事件
+      canvas.addEventListener("mousemove", function (event) {
+        if (isDragging) {
+          var deltaX = event.clientX - dragStartX;
+          var deltaY = event.clientY - dragStartY;
+
+          if (isSpacePressed) {
+            // 拖拽画布
+            canvas.style.cursor = "grabbing";
+
+            for (var i = 0; i < shapes.length; i++) {
+              var shape = shapes[i];
+              shape.x += deltaX;
+              shape.y += deltaY;
+            }
+
+            draw();
+
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+          } else {
+            // 拖拽图形
+            dragOffsetX = event.clientX - dragStartX;
+            dragOffsetY = event.clientY - dragStartY;
+
+            draw();
+          }
+        }
+      });
+
+      // 鼠标松开事件
+      canvas.addEventListener("mouseup", function (event) {
+        if (event.button === 0) {
+          isDragging = false;
+          canvas.style.cursor = "default";
+        }
+      });
+
+      // 键盘按下事件
+      window.addEventListener("keydown", function (event) {
+        if (event.code === "Space") {
+          isSpacePressed = true;
+
+          if (!isDragging) {
+            canvas.style.cursor = "grab";
+          }
+        }
+      });
+
+      // 键盘松开事件
+      window.addEventListener("keyup", function (event) {
+        if (event.code === "Space") {
+          isSpacePressed = false;
+          canvas.style.cursor = "default";
+        }
+      });
+      // 鼠标滚轮事件
+      canvas.addEventListener("wheel", function (event) {
+        event.preventDefault(); // 阻止滚轮的默认行为（即页面滚动）
+
+        var zoomDelta = event.deltaY > 0 ? 0.9 : 1.1;
+        var mouseX = event.clientX - canvas.offsetLeft;
+        var mouseY = event.clientY - canvas.offsetTop;
+        var oldScale = scale;
+        scale *= zoomDelta;
+        offsetX = (offsetX - mouseX) * zoomDelta + mouseX;
+        offsetY = (offsetY - mouseY) * zoomDelta + mouseY;
+
+        // 重新绘制矩形
+        draw();
+      });
+      // 绘制初始图形
+      draw();
+    </script>
+  </body>
+</html>
