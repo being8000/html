@@ -35,7 +35,9 @@ function init() {
   controls.update();
 
   // 渲染场景
-  function animate() {
+  function animate(time) {
+    // calculate the current animation state
+    let progress = timing(timeFraction);
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
   }

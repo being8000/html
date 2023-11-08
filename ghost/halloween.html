@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background-color: black;
+    }
+  </style>
+  <body>
+    <img
+      id="g1"
+      src="./ghost_1_dm.png"
+      style="display: none"
+      alt=""
+      srcset=""
+    />
+    <img
+      id="g2"
+      src="./ghost_2_dm.png"
+      style="display: none"
+      alt=""
+      srcset=""
+    />
+    <img
+      id="g3"
+      src="./ghost_3_dm.png"
+      style="display: none"
+      alt=""
+      srcset=""
+    />
+    <img
+      id="g4"
+      src="./ghost_4_dm.png"
+      style="display: none"
+      alt=""
+      srcset=""
+    />
+    <canvas id="canvas"></canvas>
+  </body>
+  <script src="../timing.js"></script>
+  <script>
+    const canvas = document.querySelector("#canvas");
+
+    let ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    let g1_width = 150;
+    let i = 0;
+    let max = 46;
+    let intervalOffps, current, after, elapsed;
+
+    let centerX = 240,
+      centerY = 0;
+    let realAngle = 0;
+    let mounseX,
+      mounseY = 0;
+    let distanceCX = 0;
+    let distanceCY = 0;
+    function transformCenter(progress) {
+      distanceCX = mounseX - centerX - 40;
+      distanceCY = mounseY - centerY - 40;
+      // const hyptotenues = Math.round(
+      //   Math.sqrt(Math.pow(distanceCX, 2) + Math.pow(distanceCY, 2))
+      // );
+      // if (hyptotenues < 40) {
+      //   return;
+      // }
+      if (distanceCY == 0 && distanceCY == 0) {
+        return;
+      }
+      centerX = distanceCX * progress + centerX;
+      centerY = distanceCY * progress + centerY;
+    }
+    let anmateId = null;
+    function startAnimate({ timing, draw, duration }) {
+      let start = performance.now();
+
+      anmateId = requestAnimationFrame(function animate(time) {
+        // timeFraction goes from 0 to 1
+        let timeFraction = (time - start) / duration;
+        if (timeFraction > 1) timeFraction = 1;
+
+        // calculate the current animation state
+        let progress = timing(timeFraction);
+
+        draw(progress); // draw it
+
+        if (timeFraction < 1) {
+          anmateId = requestAnimationFrame(animate);
+        }
+      });
+    }
+    const dbStart = debounce(startAnimate, 50, false);
+    let isFlip = false;
+    canvas.addEventListener("mousemove", function (p) {
+      anmateId && cancelAnimationFrame(anmateId);
+      anmateId = null;
+      const { x, y } = p;
+      mounseX = x;
+      mounseY = y;
+
+      const distanceX = x - centerX - 40,
+        distanceY = y - centerY - 40;
+      const angle = Math.atan(Math.abs(distanceY) / Math.abs(distanceX));
+
+      if (distanceX < 0 && distanceY < 0) {
+        isFlip = true;
+        realAngle = angle;
+      } else if (distanceX > 0 && distanceY < 0) {
+        isFlip = false;
+        realAngle = Math.PI * 2 - angle;
+      } else if (distanceX < 0 && distanceY > 0) {
+        isFlip = true;
+        realAngle = -angle;
+      } else if (distanceX > 0 && distanceY > 0) {
+        isFlip = false;
+        realAngle = angle;
+      }
+      dbStart({
+        timing: makeEaseOut(linear),
+        draw: transformCenter,
+        duration: 1000000 / 2,
+      });
+    });
+    function flipHorizontalDraw(
+      image,
+      sx,
+      sy,
+      sWidth,
+      sHeight,
+      dx,
+      dy,
+      dWidth,
+      dHeight
+    ) {
+      ctx.save();
+      ctx.translate(dx * 2 + dWidth, 0);
+      ctx.scale(-1, 1); // Set
+      ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+      ctx.restore();
+    }
+    function flipVerticalDraw(
+      image,
+      sx,
+      sy,
+      sWidth,
+      sHeight,
+      dx,
+      dy,
+      dWidth,
+      dHeight
+    ) {
+      ctx.save();
+      ctx.translate(0, dy * 2 + dHeight);
+      ctx.scale(1, -1); // Set
+      ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+      ctx.restore();
+    }
+    const delay = 2;
+    function setSprite(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const current = i % max;
+      const current2 = i % 57;
+      const current3 = i % 60;
+      const current4 = i % 18;
+
+      ctx.drawImage(g1, current * 150, 0, 150, 150, 0, 0, 80, 80);
+      flipHorizontalDraw(g1, current * 150, 0, 150, 150, 0, 80, 80, 80);
+      flipVerticalDraw(g1, current * 150, 0, 150, 150, 0, 160, 80, 80);
+
+      ctx.drawImage(
+        g2,
+        current2 * 150,
+        (30 * 80) / 180,
+        150,
+        180,
+        80,
+        0,
+        80,
+        80
+      );
+      flipHorizontalDraw(
+        g2,
+        current2 * 150,
+        (30 * 80) / 180,
+        150,
+        180,
+        80,
+        80,
+        80,
+        80
+      );
+      flipVerticalDraw(
+        g2,
+        current2 * 150,
+        (30 * 80) / 180,
+        150,
+        180,
+        80,
+        160,
+        80,
+        80
+      );
+      flipHorizontalDraw(
+        g3,
+        current3 * 150,
+        (30 * 80) / 180,
+        150,
+        180,
+        160,
+        80,
+        80,
+        80
+      );
+      flipVerticalDraw(
+        g3,
+        current3 * 150,
+        (30 * 80) / 180,
+        150,
+        180,
+        160,
+        160,
+        80,
+        80
+      );
+      ctx.drawImage(
+        g3,
+        current3 * 150,
+        (30 * 80) / 180,
+        150,
+        180,
+        160,
+        0,
+        80,
+        80
+      );
+
+      flipHorizontalDraw(g4, current4 * 150, 0, 150, 150, 240, 80, 80, 80);
+      flipVerticalDraw(g4, current4 * 150, 0, 150, 150, 240, 160, 80, 80);
+      ctx.save();
+      ctx.translate(centerX + 40, centerY + 40);
+      ctx.rotate(realAngle);
+      if (isFlip) {
+        flipHorizontalDraw(g4, current4 * 150, 0, 150, 150, -40, -40, 80, 80);
+      } else {
+        ctx.drawImage(g4, current4 * 150, 0, 150, 150, -40, -40, 80, 80);
+      }
+      ctx.restore();
+      i++;
+    }
+
+    function animate(t) {
+      requestAnimationFrame(animate);
+      current = performance.now();
+      elapsed = current - after;
+
+      // check if elapsed time is greater than interval, if yes, draw shape again
+      if (elapsed > intervalOffps) {
+        after = current - (elapsed % intervalOffps);
+
+        setSprite(t);
+      }
+    }
+    window.onload = function () {
+      canvas.width = document.body.getBoundingClientRect().width;
+      canvas.height = document.body.getBoundingClientRect().height;
+      // The page is completely loaded now
+      // You can reference the image element
+      let fps = 40;
+
+      // calculate interval
+      intervalOffps = 1000 / fps;
+      after = performance.now();
+      animate();
+    };
+  </script>
+</html>
