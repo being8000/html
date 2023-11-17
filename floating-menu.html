@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    .body {
+      min-height: 100vh;
+      width: 100vw;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    @keyframes menu-motion {
+      0% {
+        transform: translateX(0px) scale(1, 1);
+      }
+      50% {
+        transform: translateX(5px) scale(1.1, 1.05);
+      }
+      100% {
+        transform: translateX(0px) scale(1, 1);
+      }
+    }
+
+    .ani-menu-container {
+      counter-reset: menu-index var(--menu-index);
+      width: max-content;
+    }
+    body:hover .ani-menu-container .menu {
+      animation-play-state: paused;
+    }
+    .ani-menu-container .menu {
+      counter-increment: menu-index;
+      background-color: aquamarine;
+      width: max-content;
+      min-width: 150px;
+      margin: 5px;
+      animation-name: menu-motion;
+      animation-duration: 2s;
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+      animation-delay: var(--delay);
+      animation-timing-function: linear;
+      padding: 8px 10px;
+      border-radius: 0px 3px 3px 0px;
+      cursor: pointer;
+      position: relative;
+    }
+    .ani-menu-container .menu:hover {
+      background-color: aqua;
+    }
+    .sub-menu {
+      position: absolute;
+      left: calc(100% + 5px);
+      top: 0%;
+      width: 100%;
+      height: 100%;
+      background-color: aqua;
+    }
+    .ani-menu-container .menu::after {
+      content: attr(data-index);
+    }
+  </style>
+  <body>
+    <section class="ani-menu-container"></section>
+  </body>
+  <script>
+    const container = document.querySelector(".ani-menu-container");
+    let isSubHover = false;
+    const createSubEle = (index, parentIndex) => {
+      const ele = container.querySelectorAll(".menu")[parentIndex + index - 2];
+      if (ele) {
+        const subMenu = document.createElement("div");
+        subMenu.classList.add("sub-menu");
+        subMenu.innerHTML = index;
+        subMenu.addEventListener("mouseenter", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          isSubHover = true;
+          console.log("sub-enter");
+        });
+        subMenu.addEventListener("mouseleave", (e) => {
+          isSubHover = false;
+        });
+        ele.appendChild(subMenu);
+      }
+    };
+    const cancel = function () {
+      document.body.removeEventListener("click", cancel);
+      [...document.querySelectorAll(".sub-menu")].forEach((el) => el.remove());
+    };
+    new Array(50).fill(0).forEach((item, index) => {
+      const menuItem = document.createElement("div");
+      menuItem.classList.add("menu");
+      menuItem.dataset.index = `${index}`;
+      menuItem.style = `--delay:${index * 0.15}s`;
+      menuItem.addEventListener("mouseenter", (e) => {
+        if (isSubHover) {
+          return;
+        }
+        console.log("enter");
+        e.stopPropagation();
+        console.log(index);
+        cancel();
+        const parentIndex = index;
+        new Array(5)
+          .fill(0)
+          .forEach((el, index) => createSubEle(index, parentIndex));
+
+        document.body.addEventListener("click", cancel);
+      });
+      container.appendChild(menuItem);
+    });
+  </script>
+</html>

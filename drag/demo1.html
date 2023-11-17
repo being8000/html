@@ -15,10 +15,36 @@
       }
       #div1 {
       }
+
+      [data-drag="true"] {
+        min-height: 100px;
+        min-width: 100px;
+        border: 1px solid;
+        margin: 15px;
+      }
+      [data-drag="true"]:has(.dragging) > [draggable="true"] {
+        opacity: 0.3;
+      }
+      [draggable="true"] {
+        transition: all 0.3s;
+      }
+      [draggable="true"].dragging {
+        border: 1px solid white;
+        opacity: 1 !important;
+      }
+      /* [draggable="true"].dragging ~ :not(.dragging) {
+        border: 1px solid white;
+        opacity: 0.8;
+      } */
     </style>
   </head>
   <body class="min-h-screen items-center">
-    <section class="flex" ondrop="drop(event)" ondragover="dragover(event)">
+    <section
+      class="flex"
+      data-drag="true"
+      ondrop="drop(event)"
+      ondragover="dragover(event)"
+    >
       <div
         id="drag0"
         class="box"
@@ -75,7 +101,12 @@
         5
       </div>
     </section>
-    <section class="flex" ondrop="drop(event)" ondragover="dragover(event)">
+    <section
+      class="flex"
+      data-drag="true"
+      ondrop="drop(event)"
+      ondragover="dragover(event)"
+    >
       <div
         id="drag0"
         class="box"
@@ -142,12 +173,12 @@
     function drag(ev) {
       ev.dataTransfer.setData("text", ev.target.id);
       console.log(ev.target);
-      ev.target.classList.add("border");
+      ev.target.classList.add("dragging");
       dragEle = ev.target;
       console.log("drag");
     }
     function dragend(ev) {
-      ev.target.classList.remove("border");
+      ev.target.classList.remove("dragging");
       dragEle = null;
       console.log("dragend");
     }
@@ -172,10 +203,17 @@
     }
     function dragover(ev) {
       const { target, offsetX, offsetY, pageX, pageY, x, y } = ev;
+      if (target.dataset.drag == "true") {
+        target.appendChild(dragEle);
+        return;
+      }
+      if (target.parentElement.dataset.drag != "true") {
+        return;
+      }
       const rect = target.getBoundingClientRect();
       const left = rect.left + rect.width / 2;
       if (pageX > left) {
-        target.parentElement.insertBefore(target, dragEle);
+        target.parentElement.insertBefore(dragEle, target.nextElementSibling);
       } else {
         target.parentElement.insertBefore(dragEle, target);
       }
